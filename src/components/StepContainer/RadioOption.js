@@ -1,8 +1,14 @@
 import styled from 'styled-components';
 
-export default function RadioOption({ text, subtext, name }) {
+export default function RadioOption({ text, subtext, name, selectOption }) {
+  const selectRadio = (text) => {
+    if (selectOption) {
+      selectOption(text);
+    }
+  };
+
   return (
-    <CheckLabel>
+    <CheckLabel onClick={() => selectRadio(text)}>
       <CheckOption type='radio' name={name} />
       <RadioText>{text}</RadioText>
       <RadioSubtext>{subtext}</RadioSubtext>
