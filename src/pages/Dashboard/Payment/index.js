@@ -7,12 +7,16 @@ import RadioOption from '../../../components/StepContainer/RadioOption';
 import useTicketType from '../../../hooks/api/useTicketType';
 import { useEffect, useState } from 'react';
 import Button from '../../../components/Form/Button';
+import TicketResume from '../../../components/StepContainer/TicketResume';
+import PaymentForm from '../../../components/StepContainer/CreditCard';
 
 export default function Payment() {
   const { ticketTypesLoading, ticketTypes } = useTicketType();
   const [ticketSelected, setTicketSelected] = useState(null);
   const [hotel, setHotel] = useState(null);
   const [price, setPrice] = useState(null);
+
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
     if (ticketSelected) {
@@ -35,32 +39,63 @@ export default function Payment() {
   return (
     <>
       <StyledTypography variant="h4">Ingresso e pagamento</StyledTypography>
-      <StepContainer>
-        <StepTitle>{ticketTypes?.length !== 0 ?
-          'Primeiro, escolha sua modalidade de ingresso' :
-          'Desculpe, não há ingressos disponíveis'}</StepTitle>
-        <OptionsContainer>
-          {ticketTypesLoading ? 'Loading...' :
-            ticketTypes.map((types) => <RadioOption selectOption={setTicketSelected} key={types.id} text={types.isRemote ? 'Online' : 'Presencial'} subtext={`R$ ${(types.price / 100) + ',00'}`} name="ticketType" />)}
-        </OptionsContainer>
-      </StepContainer>
-      {ticketSelected === 'Presencial' &&
-        <StepContainer>
-          <StepTitle>Ótimo! Agora escolha sua modalidade de hospedagem</StepTitle>
-          <OptionsContainer>
-            <RadioOption selectOption={setHotel} text={'Sem Hotel'} subtext={'+ R$ 0'} name="withHotel" />
-            <RadioOption selectOption={setHotel} text={'Com Hotel'} subtext={'+ R$ 100'} name="withHotel" />
-          </OptionsContainer>
-        </StepContainer>}
-      {(ticketSelected === 'Online' || hotel !== null) &&
-        <StepContainer>
-          <StepTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</StepTitle>
-          <OptionsContainer>
-            <Button onClick={() => console.log('clicado')} type="submit">
-              RESERVAR INGRESSO
+      {!finished ?
+        <>
+          <StepContainer>
+            <StepTitle>{ticketTypes?.length !== 0 ?
+              'Primeiro, escolha sua modalidade de ingresso' :
+              'Desculpe, não há ingressos disponíveis'}</StepTitle>
+            <OptionsContainer>
+              {ticketTypesLoading ? 'Loading...' :
+                ticketTypes.map((types) => <RadioOption selectOption={setTicketSelected} key={types.id} text={types.isRemote ? 'Online' : 'Presencial'} subtext={`R$ ${(types.price / 100) + ',00'}`} name="ticketType" />)}
+            </OptionsContainer>
+          </StepContainer>
+          {ticketSelected === 'Presencial' &&
+            <StepContainer>
+              <StepTitle>Ótimo! Agora escolha sua modalidade de hospedagem</StepTitle>
+              <OptionsContainer>
+                <RadioOption selectOption={setHotel} text={'Sem Hotel'} subtext={'+ R$ 0'} name="withHotel" />
+                <RadioOption selectOption={setHotel} text={'Com Hotel'} subtext={'+ R$ 100'} name="withHotel" />
+              </OptionsContainer>
+            </StepContainer>}
+          {(ticketSelected === 'Online' || hotel !== null) &&
+            <StepContainer>
+              <StepTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</StepTitle>
+              <OptionsContainer>
+                <Button onClick={() => setFinished(true)} type="submit">
+                  RESERVAR INGRESSO
+                </Button>
+              </OptionsContainer>
+            </StepContainer>}
+        </>
+        :
+        <>
+          <StepContainer>
+            <StepTitle>
+              Ingresso escolhido
+            </StepTitle>
+            <OptionsContainer>
+              <TicketResume text={hotel ? ticketSelected + ' + ' + hotel : ticketSelected} subtext={'R$ ' + price} name="selectedTicket" />
+            </OptionsContainer>
+          </StepContainer>
+
+          <StepContainer>
+            <StepTitle>
+              Pagamento
+            </StepTitle>
+            <OptionsContainer>
+              <PaymentForm />
+            </OptionsContainer>
+          </StepContainer>
+
+          <StepContainer>
+            <Button onClick={() => alert('Quase lá')} type="submit">
+              FINALIZAR PAGAMENTO
             </Button>
-          </OptionsContainer>
-        </StepContainer>}
+          </StepContainer>
+
+        </>
+      }
     </>
   );
 }
