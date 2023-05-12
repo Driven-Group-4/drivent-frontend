@@ -15,7 +15,10 @@ export default function Hotel() {
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
       <StepContainer>
-        <StepTitle>Primeiro, escolha seu hotel</StepTitle>
+        <StepTitle>{hotels?
+          'Primeiro, escolha seu hotel':
+          'Desculpe, não há hotéis disponíveis'
+        }</StepTitle>
         <OptionsContainer>
           { hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />) }
         </OptionsContainer>

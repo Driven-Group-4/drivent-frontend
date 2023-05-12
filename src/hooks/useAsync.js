@@ -23,7 +23,7 @@ export default function useAsync(handler, immediate = true) {
 
   useEffect(() => {
     if (immediate) {
-      act();
+      act().catch(() => {});
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
