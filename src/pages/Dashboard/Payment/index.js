@@ -23,16 +23,16 @@ export default function Payment() {
       const type = ticketTypes.filter(tt => tt.name === ticketSelected);
       if (ticketSelected === 'Presencial') {
         if (hotel === 'Com Hotel') {
-          setPrice((type[0].price / 100) + 100 + ',00');
+          setPrice((type[0]?.price / 100) + 100 + ',00');
           return;
         }
         else {
-          setPrice(type[0].price / 100 + ',00');
+          setPrice(type[0]?.price / 100 + ',00');
           return;
         }
       }
       setHotel(null);
-      setPrice(type[0].price / 100 + ',00');
+      setPrice(type[0]?.price / 100 + ',00');
     };
   }, [ticketSelected, hotel]);
 
