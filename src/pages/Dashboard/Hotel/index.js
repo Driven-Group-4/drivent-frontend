@@ -6,9 +6,12 @@ import useHotels from '../../../hooks/api/useHotel.js';
 import HotelCard from '../../../components/StepContainer/HotelCard';
 import OptionsContainer from '../../../components/StepContainer/OptionsContainer';
 import { useState } from 'react';
+import RoomOption from '../../../components/StepContainer/RoomOption';
+import Button from '../../../components/Form/Button';
 
 export default function Hotel() {
   const [ selectedHotel, setSelectedHotel ] = useState(null);
+  const [ selectedRoom, setSelectedRoom ] = useState(null);
   const { hotels } = useHotels();
 
   return (
@@ -23,6 +26,21 @@ export default function Hotel() {
           { hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />) }
         </OptionsContainer>
       </StepContainer>
+      { selectedHotel &&
+          <StepContainer>
+            <StepTitle>Ótima pedida! Agora escolha seu quarto</StepTitle>
+            <OptionsContainer>
+              { selectedHotel?.Rooms?.map((r) => <RoomOption key={r.id} roomInfo={r} selectedRoom={selectedRoom} setSelectedRoom={setSelectedRoom} />) }
+            </OptionsContainer>
+          </StepContainer>
+      }
+      { selectedRoom && 
+        <StepContainer>
+          <Button onClick={() => alert('Quase lá')} type="submit">
+            FINALIZAR PAGAMENTO
+          </Button>
+        </StepContainer>
+      }
     </>
   );
 }
