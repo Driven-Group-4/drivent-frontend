@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import Button from '../../../components/Form/Button';
 import TicketResume from '../../../components/StepContainer/TicketResume';
 import PaymentForm from '../../../components/StepContainer/CreditCard';
+import vectorLogo from '../../../assets/images/vector.png';
 
 export default function Payment() {
   const { ticketTypesLoading, ticketTypes } = useTicketType();
@@ -18,21 +19,23 @@ export default function Payment() {
 
   const [finished, setFinished] = useState(false);
 
+  const [show, setShow] = useState(true);
+
   useEffect(() => {
     if (ticketSelected) {
       const type = ticketTypes.filter(tt => tt.name === ticketSelected);
       if (ticketSelected === 'Presencial') {
         if (hotel === 'Com Hotel') {
-          setPrice((type[0].price / 100) + 100 + ',00');
+          setPrice((type[0]?.price / 100) + 100 + ',00');
           return;
         }
         else {
-          setPrice(type[0].price / 100 + ',00');
+          setPrice(type[0]?.price / 100 + ',00');
           return;
         }
       }
       setHotel(null);
-      setPrice(type[0].price / 100 + ',00');
+      setPrice(type[0]?.price / 100 + ',00');
     };
   }, [ticketSelected, hotel]);
 
@@ -41,6 +44,7 @@ export default function Payment() {
       <StyledTypography variant="h4">Ingresso e pagamento</StyledTypography>
       {!finished ?
         <>
+
           <StepContainer>
             <StepTitle>{ticketTypes?.length !== 0 ?
               'Primeiro, escolha sua modalidade de ingresso' :
@@ -79,21 +83,35 @@ export default function Payment() {
             </OptionsContainer>
           </StepContainer>
 
-          <StepContainer>
-            <StepTitle>
+          {show ?
+            <>
+              <StepContainer>
+                <StepTitle>
+                  Pagamento
+                </StepTitle>
+                <OptionsContainer>
+                  <PaymentForm />
+                </OptionsContainer>
+              </StepContainer>
+              <StepContainer>
+                <Button onClick={() => setShow(!show)} type="submit">
+                  FINALIZAR PAGAMENTO
+                </Button>
+              </StepContainer>
+            </>
+            :
+            <><StepTitle>
               Pagamento
             </StepTitle>
-            <OptionsContainer>
-              <PaymentForm />
-            </OptionsContainer>
-          </StepContainer>
-
-          <StepContainer>
-            <Button onClick={() => alert('Quase lá')} type="submit">
-              FINALIZAR PAGAMENTO
-            </Button>
-          </StepContainer>
-
+            <PaymentConfirmed>
+              <ImageConfirmed src={vectorLogo} alt="confirmado" />
+              <PageConfirmed>
+                <b><p>Pagamento confirmado!</p></b>
+                <p>Prossiga para escolha de hospedagem e atividades</p>
+              </PageConfirmed>
+            </PaymentConfirmed>
+            </>}
+          
         </>
       }
     </>
@@ -102,4 +120,34 @@ export default function Payment() {
 
 const StyledTypography = styled(Typography)`
   margin-bottom: 20px!important;
+`;
+const ImageConfirmed = styled.img`
+  width:40.33px;
+`;
+const PaymentConfirmed = styled.div`
+  display:flex;
+  flex-direction:row;
+`;
+const PageConfirmed = styled.div`
+  display: flex;
+  flex-direction:column;
+  margin-left:13.83px;
+  justify-content:center;
+  p:nth-child(1){
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 19px;
+    color: #454545;
+  }
+  p:nth-child(2){
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    color: #454545;
+  }
+  
 `;
