@@ -6,7 +6,6 @@ export async function save(body, token) {
       Authorization: `Bearer ${token}`,
     },
   });
-
   return response.data;
 }
 
