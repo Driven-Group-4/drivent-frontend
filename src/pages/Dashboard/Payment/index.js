@@ -21,8 +21,8 @@ export default function Payment() {
   const token = useToken();
   const { ticketTypesLoading, ticketTypes } = useTicketType();
   const { postTicketReserv } = useTicket();
-  const { enrollment, enrollmentLoading } = useEnrollment();
-  const { userTicket, userTicketLoading } = useGetTicket();
+  const { enrollment } = useEnrollment();
+  const { userTicket } = useGetTicket();
   const [ticketSelected, setTicketSelected] = useState(null);
   const [type, setType] = useState(0);
   const [hotel, setHotel] = useState(null);
@@ -30,8 +30,6 @@ export default function Payment() {
   const [resume, setResume] = useState(false);
 
   const [finished, setFinished] = useState(false);
-
-  const [show, setShow] = useState(true);
 
   async function handleReserv(e) {
     e.preventDefault();
@@ -42,10 +40,9 @@ export default function Payment() {
       await postTicketReserv(token, type.id);
       const ticket = await getTicket(token);
       setResume(ticket);
-
       setFinished(true);
     } catch (error) {
-      console.error(error.message);
+      toast('Não possível realizar a reserva');
     }
   }
 
@@ -84,14 +81,15 @@ export default function Payment() {
           <Title>
             <b>
               <p>
-                Você precisa completar sua inscrição antes<br/>
+                Você precisa completar sua inscrição antes<br />
                 de proseguir pra escolha de ingresso
               </p>
             </b>
           </Title>
         </AlertSubscription>
       </>
-    );}
+    );
+  }
   else {
     return (
       <>
@@ -119,68 +117,63 @@ export default function Payment() {
               <StepContainer>
                 <StepTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</StepTitle>
                 <OptionsContainer>
-                  <Button onClick={e => handleReserv(e)} type="submit">
+                  <Button onClick={(e) => handleReserv(e)} type="submit">
                     RESERVAR INGRESSO
                   </Button>
                 </OptionsContainer>
               </StepContainer>}
           </>
           :
-          <>
-            <StepContainer>
-              <StepTitle>
-                Ingresso escolhido
-              </StepTitle>
-              <OptionsContainer>
-                {resume ?
+          resume ?
+            <>
+              <StepContainer>
+                <StepTitle>
+                  Ingresso escolhido
+                </StepTitle>
+                <OptionsContainer>
                   <TicketResume
                     text={
                       resume.TicketType.isRemote ? 'Online' : 'Presencial + Com Hotel'
                     }
                     subtext={'R$ ' + price}
                     name="selectedTicket" />
-                  : 'Loading'
-                }
-              </OptionsContainer>
-            </StepContainer>
+                </OptionsContainer>
+              </StepContainer>
 
-            {
-              show ?
-                <>
-                  <StepContainer>
+              {
+                resume.status === 'RESERVED' ?
+                  <>
+                    <StepContainer>
+                      <StepTitle>
+                        Pagamento
+                      </StepTitle>
+                      <OptionsContainer>
+                        <PaymentForm nam={enrollment ? enrollment.name : ''} ticketId={resume.id} setResume={setResume} />
+                      </OptionsContainer>
+                    </StepContainer>
+                  </>
+                  :
+                  <>
                     <StepTitle>
                       Pagamento
                     </StepTitle>
-                    <OptionsContainer>
-                      <PaymentForm />
-                    </OptionsContainer>
-                  </StepContainer>
-                  <StepContainer>
-                    <Button onClick={() => setShow(!show)} type="submit">
-                      FINALIZAR PAGAMENTO
-                    </Button>
-                  </StepContainer>
-                </>
-                :
-                <>
-                  <StepTitle>
-                    Pagamento
-                  </StepTitle>
-                  <PaymentConfirmed>
-                    <ImageConfirmed src={vectorLogo} alt="confirmado" />
-                    <PageConfirmed>
-                      <b><p>Pagamento confirmado!</p></b>
-                      <p>Prossiga para escolha de hospedagem e atividades</p>
-                    </PageConfirmed>
-                  </PaymentConfirmed>
-                </>
-            }
-          </>
+                    <PaymentConfirmed>
+                      <ImageConfirmed src={vectorLogo} alt="confirmado" />
+                      <PageConfirmed>
+                        <b><p>Pagamento confirmado!</p></b>
+                        <p>Prossiga para escolha de hospedagem e atividades</p>
+                      </PageConfirmed>
+                    </PaymentConfirmed>
+                  </>
+              }
+            </> :
+            <>Loading</>
         }
-        
+
       </>
-  
-    );};
+
+    );
+  };
 }
 
 const StyledTypography = styled(Typography)`
@@ -217,7 +210,7 @@ const PageConfirmed = styled.div`
   
 `;
 
-const AlertSubscription = styled.div `
+const AlertSubscription = styled.div`
 display:flex,
 justify-content:center,;
 `;
