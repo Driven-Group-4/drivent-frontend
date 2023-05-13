@@ -10,34 +10,71 @@ import Button from '../../../components/Form/Button';
 import TicketResume from '../../../components/StepContainer/TicketResume';
 import PaymentForm from '../../../components/StepContainer/CreditCard';
 import vectorLogo from '../../../assets/images/vector.png';
+import useEnrollment from '../../../hooks/api/useEnrollment';
+import { toast } from 'react-toastify';
+import useTicket from '../../../hooks/api/useTicket';
+import useToken from '../../../hooks/useToken';
+import useGetTicket from '../../../hooks/api/useGetTicket';
+import { getTicket } from '../../../services/ticketAPI';
 
 export default function Payment() {
+  const token = useToken();
   const { ticketTypesLoading, ticketTypes } = useTicketType();
+  const { postTicketReserv } = useTicket();
+  const { enrollment, enrollmentLoading } = useEnrollment();
+  const { userTicket, userTicketLoading } = useGetTicket();
   const [ticketSelected, setTicketSelected] = useState(null);
+  const [type, setType] = useState(0);
   const [hotel, setHotel] = useState(null);
   const [price, setPrice] = useState(null);
+  const [resume, setResume] = useState(false);
 
   const [finished, setFinished] = useState(false);
 
   const [show, setShow] = useState(true);
 
+  async function handleReserv(e) {
+    e.preventDefault();
+
+    if (!enrollment) return toast('Por favor conclua a sua inscição!');
+
+    try {
+      await postTicketReserv(token, type.id);
+      const ticket = await getTicket(token);
+      setResume(ticket);
+
+      setFinished(true);
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
   useEffect(() => {
     if (ticketSelected) {
-      const type = ticketTypes.filter(tt => tt.name === ticketSelected);
       if (ticketSelected === 'Presencial') {
+        const tip = ticketTypes.filter(tt => tt.isRemote === false);
+        setType(tip[0]);
         if (hotel === 'Com Hotel') {
-          setPrice((type[0]?.price / 100) + 100 + ',00');
+          setPrice((tip[0]?.price / 100) + 100 + ',00');
           return;
         }
         else {
-          setPrice(type[0]?.price / 100 + ',00');
+          setPrice(tip[0]?.price / 100 + ',00');
           return;
         }
       }
+      const tip = ticketTypes.filter(tt => tt.isRemote === true);
+      setType(tip[0]);
       setHotel(null);
-      setPrice(type[0]?.price / 100 + ',00');
+      setPrice((tip[0]?.price / 100) + ',00');
     };
-  }, [ticketSelected, hotel]);
+
+    if (userTicket) {
+      setResume(userTicket);
+      setPrice((userTicket.TicketType.price / 100) + ',00');
+      setFinished(true);
+    }
+  }, [ticketSelected, hotel, userTicket]);
 
   return (
     <>
@@ -66,7 +103,7 @@ export default function Payment() {
             <StepContainer>
               <StepTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</StepTitle>
               <OptionsContainer>
-                <Button onClick={() => setFinished(true)} type="submit">
+                <Button onClick={e => handleReserv(e)} type="submit">
                   RESERVAR INGRESSO
                 </Button>
               </OptionsContainer>
@@ -79,39 +116,49 @@ export default function Payment() {
               Ingresso escolhido
             </StepTitle>
             <OptionsContainer>
-              <TicketResume text={hotel ? ticketSelected + ' + ' + hotel : ticketSelected} subtext={'R$ ' + price} name="selectedTicket" />
+              {resume ?
+                <TicketResume
+                  text={
+                    resume.TicketType.isRemote ? 'Online' : 'Presencial + Com Hotel'
+                  }
+                  subtext={'R$ ' + price}
+                  name="selectedTicket" />
+                : 'Loading'
+              }
             </OptionsContainer>
           </StepContainer>
 
-          {show ?
-            <>
-              <StepContainer>
+          {
+            show ?
+              <>
+                <StepContainer>
+                  <StepTitle>
+                    Pagamento
+                  </StepTitle>
+                  <OptionsContainer>
+                    <PaymentForm />
+                  </OptionsContainer>
+                </StepContainer>
+                <StepContainer>
+                  <Button onClick={() => setShow(!show)} type="submit">
+                    FINALIZAR PAGAMENTO
+                  </Button>
+                </StepContainer>
+              </>
+              :
+              <>
                 <StepTitle>
                   Pagamento
                 </StepTitle>
-                <OptionsContainer>
-                  <PaymentForm />
-                </OptionsContainer>
-              </StepContainer>
-              <StepContainer>
-                <Button onClick={() => setShow(!show)} type="submit">
-                  FINALIZAR PAGAMENTO
-                </Button>
-              </StepContainer>
-            </>
-            :
-            <><StepTitle>
-              Pagamento
-            </StepTitle>
-            <PaymentConfirmed>
-              <ImageConfirmed src={vectorLogo} alt="confirmado" />
-              <PageConfirmed>
-                <b><p>Pagamento confirmado!</p></b>
-                <p>Prossiga para escolha de hospedagem e atividades</p>
-              </PageConfirmed>
-            </PaymentConfirmed>
-            </>}
-          
+                <PaymentConfirmed>
+                  <ImageConfirmed src={vectorLogo} alt="confirmado" />
+                  <PageConfirmed>
+                    <b><p>Pagamento confirmado!</p></b>
+                    <p>Prossiga para escolha de hospedagem e atividades</p>
+                  </PageConfirmed>
+                </PaymentConfirmed>
+              </>
+          }
         </>
       }
     </>
