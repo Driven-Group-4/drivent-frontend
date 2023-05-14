@@ -159,9 +159,9 @@ export default function PaymentForm({ nam, ticketId, setResume }) {
             <input
               type="tel"
               name="number"
-              val={number}
+              value={number}
               placeholder="Card Number"
-              onChange={e => setNumber(e.target.value)}
+              onChange={e => { if (e.target.value.length < 20) setNumber(e.target.value.replace(/\D/g, '')); }}
               onFocus={e => setFocus(e.target.name)}
             />
             E.g.:49..., 51..., 36..., 37...
@@ -180,7 +180,7 @@ export default function PaymentForm({ nam, ticketId, setResume }) {
               name="expiry"
               value={expiry}
               placeholder="Valid Thru"
-              onChange={e => setExpiry(e.target.value)}
+              onChange={e => { if (e.target.value.length < 5) setExpiry(e.target.value.replace(/\D/g, '')); }}
               onFocus={e => setFocus(e.target.name)}
             />
             <input
@@ -188,7 +188,7 @@ export default function PaymentForm({ nam, ticketId, setResume }) {
               name="cvc"
               value={cvc}
               placeholder="CVC"
-              onChange={e => setCvc(e.target.value)}
+              onChange={e => { if (e.target.value.length < 5) setCvc(e.target.value.replace(/\D/g, '')); }}
               onFocus={e => setFocus(e.target.name)}
             />
           </div>
