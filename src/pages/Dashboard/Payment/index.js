@@ -37,7 +37,6 @@ export default function Payment() {
     if (!enrollment) return toast('Por favor conclua a sua inscição!');
 
     try {
-      console.log(type.id);
       await postTicketReserv(token, type.id);
       const ticket = await getTicket(token);
       setResume(ticket);
@@ -106,21 +105,21 @@ export default function Payment() {
               <OptionsContainer>
                 {ticketTypesLoading ? 'Loading...' :
                   ticketTypes.map((types) => types.isRemote ?
-                    <RadioOption 
-                      selectOption={setTicketSelected} 
-                      key={types.id} 
-                      onClick={() => console.log(types.id)} 
-                      text={types.isRemote ? 'Online' : 'Presencial'} 
-                      subtext={`R$ ${(types.price / 100) + ',00'}`} 
-                      name="ticketType" 
-                    /> 
-                    : 
+                    <RadioOption
+                      selectOption={setTicketSelected}
+                      key={types.id}
+                      onClick={() => console.log(types.id)}
+                      text={types.isRemote ? 'Online' : 'Presencial'}
+                      subtext={`R$ ${(types.price / 100) + ',00'}`}
+                      name="ticketType"
+                    />
+                    :
                     types.includesHotel ?
-                      <RadioOption 
-                        selectOption={setTicketSelected} 
-                        text={types.isRemote ? 'Online' : 'Presencial'} 
-                        subtext={'R$ 500,00'} 
-                        name="ticketType" 
+                      <RadioOption
+                        selectOption={setTicketSelected}
+                        text={types.isRemote ? 'Online' : 'Presencial'}
+                        subtext={'R$ 500,00'}
+                        name="ticketType"
                       />
                       :
                       <div style={{ marginLeft: '-25px' }}></div>
@@ -136,19 +135,19 @@ export default function Payment() {
                   {
                     ticketTypes.map((types) => types.includesHotel ?
                       <RadioOption
-                        selectOption={setHotel} 
-                        key={types.id} 
-                        text={'Com Hotel'} 
-                        subtext={'R$ 100,00'} 
-                        name="withHotel" 
-                      /> 
+                        selectOption={setHotel}
+                        key={types.id}
+                        text={'Com Hotel'}
+                        subtext={'R$ 100,00'}
+                        name="withHotel"
+                      />
                       : !types.isRemote ?
                         <RadioOption
-                          selectOption={setHotel} 
+                          selectOption={setHotel}
                           key={types.id}
-                          text={'Sem Hotel'} 
-                          subtext={'R$ 0,00'} 
-                          name="withHotel" 
+                          text={'Sem Hotel'}
+                          subtext={'R$ 0,00'}
+                          name="withHotel"
                         />
                         :
                         <div></div>
