@@ -21,8 +21,8 @@ export default function Payment() {
   const token = useToken();
   const { ticketTypesLoading, ticketTypes } = useTicketType();
   const { postTicketReserv } = useTicket();
-  const { enrollment, enrollmentLoading } = useEnrollment();
-  const { userTicket, userTicketLoading } = useGetTicket();
+  const { enrollment } = useEnrollment();
+  const { userTicket } = useGetTicket();
   const [ticketSelected, setTicketSelected] = useState(null);
   const [type, setType] = useState(0);
   const [hotel, setHotel] = useState(null);
@@ -30,8 +30,6 @@ export default function Payment() {
   const [resume, setResume] = useState(false);
 
   const [finished, setFinished] = useState(false);
-
-  const [show, setShow] = useState(true);
 
   async function handleReserv(e) {
     e.preventDefault();
@@ -43,10 +41,9 @@ export default function Payment() {
       await postTicketReserv(token, type.id);
       const ticket = await getTicket(token);
       setResume(ticket);
-
       setFinished(true);
     } catch (error) {
-      console.error(error.message);
+      toast('Não possível realizar a reserva');
     }
   }
 
@@ -79,133 +76,147 @@ export default function Payment() {
     }
   }, [ticketSelected, hotel, userTicket]);
 
-  return (
-    <>
-      <StyledTypography variant="h4">Ingresso e pagamento</StyledTypography>
-      {!finished ?
-        <>
-
-          <StepContainer>
-            <StepTitle>{ticketTypes?.length !== 0 ?
-              'Primeiro, escolha sua modalidade de ingresso' :
-              'Desculpe, não há ingressos disponíveis'}</StepTitle>
-            <OptionsContainer>
-              {ticketTypesLoading ? 'Loading...' :
-                ticketTypes.map((types) => types.isRemote ?
-                  <RadioOption 
-                    selectOption={setTicketSelected} 
-                    key={types.id} 
-                    onClick={() => console.log(types.id)} 
-                    text={types.isRemote ? 'Online' : 'Presencial'} 
-                    subtext={`R$ ${(types.price / 100) + ',00'}`} 
-                    name="ticketType" 
-                  /> 
-                  : 
-                  types.includesHotel ?
+  if (!enrollment) {
+    return (
+      <>
+        <StyledTypography variant="h4">Ingresso e pagamento</StyledTypography>
+        <AlertSubscription>
+          <Title>
+            <b>
+              <p>
+                Você precisa completar sua inscrição antes<br />
+                de proseguir pra escolha de ingresso
+              </p>
+            </b>
+          </Title>
+        </AlertSubscription>
+      </>
+    );
+  }
+  else {
+    return (
+      <>
+        <StyledTypography variant="h4">Ingresso e pagamento</StyledTypography>
+        {!finished ?
+          <>
+            <StepContainer>
+              <StepTitle>{ticketTypes?.length !== 0 ?
+                'Primeiro, escolha sua modalidade de ingresso' :
+                'Desculpe, não há ingressos disponíveis'}</StepTitle>
+              <OptionsContainer>
+                {ticketTypesLoading ? 'Loading...' :
+                  ticketTypes.map((types) => types.isRemote ?
                     <RadioOption 
                       selectOption={setTicketSelected} 
-                      text={types.isRemote ? 'Online' : 'Presencial'} 
-                      subtext={'R$ 500,00'} 
-                      name="ticketType" 
-                    />
-                    :
-                    <div style={{ marginLeft: '-25px' }}></div>
-                )
-              }
-
-            </OptionsContainer>
-          </StepContainer>
-          {ticketSelected === 'Presencial' &&
-            <StepContainer>
-              <StepTitle>Ótimo! Agora escolha sua modalidade de hospedagem</StepTitle>
-              <OptionsContainer>
-                {
-                  ticketTypes.map((types) => types.includesHotel ?
-                    <RadioOption
-                      selectOption={setHotel} 
                       key={types.id} 
-                      text={'Com Hotel'} 
-                      subtext={'R$ 100,00'} 
-                      name="withHotel" 
+                      onClick={() => console.log(types.id)} 
+                      text={types.isRemote ? 'Online' : 'Presencial'} 
+                      subtext={`R$ ${(types.price / 100) + ',00'}`} 
+                      name="ticketType" 
                     /> 
-                    : !types.isRemote ?
-                      <RadioOption
-                        selectOption={setHotel} 
-                        key={types.id}
-                        text={'Sem Hotel'} 
-                        subtext={'R$ 0,00'} 
-                        name="withHotel" 
+                    : 
+                    types.includesHotel ?
+                      <RadioOption 
+                        selectOption={setTicketSelected} 
+                        text={types.isRemote ? 'Online' : 'Presencial'} 
+                        subtext={'R$ 500,00'} 
+                        name="ticketType" 
                       />
                       :
-                      <div></div>
+                      <div style={{ marginLeft: '-25px' }}></div>
                   )
                 }
-              </OptionsContainer>
-            </StepContainer>}
-          {(ticketSelected === 'Online' || hotel !== null) &&
-            <StepContainer>
-              <StepTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</StepTitle>
-              <OptionsContainer>
-                <Button onClick={e => handleReserv(e)} type="submit">
-                  RESERVAR INGRESSO
-                </Button>
-              </OptionsContainer>
-            </StepContainer>}
-        </>
-        :
-        <>
-          <StepContainer>
-            <StepTitle>
-              Ingresso escolhido
-            </StepTitle>
-            <OptionsContainer>
-              {resume ?
-                <TicketResume
-                  text={
-                    resume.TicketType.isRemote ? 'Online' : resume.TicketType.includesHotel ? 'Presencial + Com Hotel' : 'Presencial + Sem Hotel'
-                  }
-                  subtext={'R$ ' + price}
-                  name="selectedTicket" />
-                : 'Loading'
-              }
-            </OptionsContainer>
-          </StepContainer>
 
-          {
-            show ?
-              <>
-                <StepContainer>
-                  <StepTitle>
-                    Pagamento
-                  </StepTitle>
-                  <OptionsContainer>
-                    <PaymentForm />
-                  </OptionsContainer>
-                </StepContainer>
-                <StepContainer>
-                  <Button onClick={() => setShow(!show)} type="submit">
-                    FINALIZAR PAGAMENTO
+              </OptionsContainer>
+            </StepContainer>
+            {ticketSelected === 'Presencial' &&
+              <StepContainer>
+                <StepTitle>Ótimo! Agora escolha sua modalidade de hospedagem</StepTitle>
+                <OptionsContainer>
+                  {
+                    ticketTypes.map((types) => types.includesHotel ?
+                      <RadioOption
+                        selectOption={setHotel} 
+                        key={types.id} 
+                        text={'Com Hotel'} 
+                        subtext={'R$ 100,00'} 
+                        name="withHotel" 
+                      /> 
+                      : !types.isRemote ?
+                        <RadioOption
+                          selectOption={setHotel} 
+                          key={types.id}
+                          text={'Sem Hotel'} 
+                          subtext={'R$ 0,00'} 
+                          name="withHotel" 
+                        />
+                        :
+                        <div></div>
+                    )
+                  }
+                </OptionsContainer>
+              </StepContainer>}
+            {(ticketSelected === 'Online' || hotel !== null) &&
+              <StepContainer>
+                <StepTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</StepTitle>
+                <OptionsContainer>
+                  <Button onClick={(e) => handleReserv(e)} type="submit">
+                    RESERVAR INGRESSO
                   </Button>
-                </StepContainer>
-              </>
-              :
-              <>
+                </OptionsContainer>
+              </StepContainer>}
+          </>
+          :
+          resume ?
+            <>
+              <StepContainer>
                 <StepTitle>
-                  Pagamento
+                  Ingresso escolhido
                 </StepTitle>
-                <PaymentConfirmed>
-                  <ImageConfirmed src={vectorLogo} alt="confirmado" />
-                  <PageConfirmed>
-                    <b><p>Pagamento confirmado!</p></b>
-                    <p>Prossiga para escolha de hospedagem e atividades</p>
-                  </PageConfirmed>
-                </PaymentConfirmed>
-              </>
-          }
-        </>
-      }
-    </>
-  );
+                <OptionsContainer>
+                  <TicketResume
+                    text={
+                      resume.TicketType.isRemote ? 'Online' : resume.TicketType.includesHotel ? 'Presencial + Com Hotel' : 'Presencial + Sem Hotel'
+                    }
+                    subtext={'R$ ' + price}
+                    name="selectedTicket" />
+                </OptionsContainer>
+              </StepContainer>
+
+              {
+                resume.status === 'RESERVED' ?
+                  <>
+                    <StepContainer>
+                      <StepTitle>
+                        Pagamento
+                      </StepTitle>
+                      <OptionsContainer>
+                        <PaymentForm nam={enrollment ? enrollment.name : ''} ticketId={resume.id} setResume={setResume} />
+                      </OptionsContainer>
+                    </StepContainer>
+                  </>
+                  :
+                  <>
+                    <StepTitle>
+                      Pagamento
+                    </StepTitle>
+                    <PaymentConfirmed>
+                      <ImageConfirmed src={vectorLogo} alt="confirmado" />
+                      <PageConfirmed>
+                        <b><p>Pagamento confirmado!</p></b>
+                        <p>Prossiga para escolha de hospedagem e atividades</p>
+                      </PageConfirmed>
+                    </PaymentConfirmed>
+                  </>
+              }
+            </> :
+            <>Loading</>
+        }
+
+      </>
+
+    );
+  };
 }
 
 const StyledTypography = styled(Typography)`
@@ -240,4 +251,17 @@ const PageConfirmed = styled.div`
     color: #454545;
   }
   
+`;
+
+const AlertSubscription = styled.div`
+display:flex,
+justify-content:center,;
+`;
+
+const Title = styled.div`
+  text-align:center;
+  font-size: 20px;
+  font-weight: 400;
+  color: #8E8E8E;
+  margin-top: 240px;
 `;
