@@ -39,6 +39,7 @@ export default function Payment() {
     if (!enrollment) return toast('Por favor conclua a sua inscição!');
 
     try {
+      console.log(type.id);
       await postTicketReserv(token, type.id);
       const ticket = await getTicket(token);
       setResume(ticket);
@@ -52,14 +53,16 @@ export default function Payment() {
   useEffect(() => {
     if (ticketSelected) {
       if (ticketSelected === 'Presencial') {
-        const tip = ticketTypes.filter(tt => tt.isRemote === false);
-        setType(tip[0]);
         if (hotel === 'Com Hotel') {
-          setPrice((tip[0]?.price / 100) + 100 + ',00');
+          const withHotel = ticketTypes.filter(tt => tt.includesHotel === true);
+          setType(withHotel[0]);
+          setPrice(withHotel[0]?.price / 100 + ',00');
           return;
         }
         else {
-          setPrice(tip[0]?.price / 100 + ',00');
+          const withoutHotel = ticketTypes.filter(tt => tt.includesHotel === false);
+          setType(withoutHotel[0]);
+          setPrice(withoutHotel[0]?.price / 100 + ',00');
           return;
         }
       }
@@ -88,15 +91,55 @@ export default function Payment() {
               'Desculpe, não há ingressos disponíveis'}</StepTitle>
             <OptionsContainer>
               {ticketTypesLoading ? 'Loading...' :
-                ticketTypes.map((types) => <RadioOption selectOption={setTicketSelected} key={types.id} text={types.isRemote ? 'Online' : 'Presencial'} subtext={`R$ ${(types.price / 100) + ',00'}`} name="ticketType" />)}
+                ticketTypes.map((types) => types.isRemote ?
+                  <RadioOption 
+                    selectOption={setTicketSelected} 
+                    key={types.id} 
+                    onClick={() => console.log(types.id)} 
+                    text={types.isRemote ? 'Online' : 'Presencial'} 
+                    subtext={`R$ ${(types.price / 100) + ',00'}`} 
+                    name="ticketType" 
+                  /> 
+                  : 
+                  types.includesHotel ?
+                    <RadioOption 
+                      selectOption={setTicketSelected} 
+                      text={types.isRemote ? 'Online' : 'Presencial'} 
+                      subtext={'R$ 500,00'} 
+                      name="ticketType" 
+                    />
+                    :
+                    <div style={{ marginLeft: '-25px' }}></div>
+                )
+              }
+
             </OptionsContainer>
           </StepContainer>
           {ticketSelected === 'Presencial' &&
             <StepContainer>
               <StepTitle>Ótimo! Agora escolha sua modalidade de hospedagem</StepTitle>
               <OptionsContainer>
-                <RadioOption selectOption={setHotel} text={'Sem Hotel'} subtext={'+ R$ 0'} name="withHotel" />
-                <RadioOption selectOption={setHotel} text={'Com Hotel'} subtext={'+ R$ 100'} name="withHotel" />
+                {
+                  ticketTypes.map((types) => types.includesHotel ?
+                    <RadioOption
+                      selectOption={setHotel} 
+                      key={types.id} 
+                      text={'Com Hotel'} 
+                      subtext={'R$ 100,00'} 
+                      name="withHotel" 
+                    /> 
+                    : !types.isRemote ?
+                      <RadioOption
+                        selectOption={setHotel} 
+                        key={types.id}
+                        text={'Sem Hotel'} 
+                        subtext={'R$ 0,00'} 
+                        name="withHotel" 
+                      />
+                      :
+                      <div></div>
+                  )
+                }
               </OptionsContainer>
             </StepContainer>}
           {(ticketSelected === 'Online' || hotel !== null) &&
@@ -119,7 +162,7 @@ export default function Payment() {
               {resume ?
                 <TicketResume
                   text={
-                    resume.TicketType.isRemote ? 'Online' : 'Presencial + Com Hotel'
+                    resume.TicketType.isRemote ? 'Online' : resume.TicketType.includesHotel ? 'Presencial + Com Hotel' : 'Presencial + Sem Hotel'
                   }
                   subtext={'R$ ' + price}
                   name="selectedTicket" />

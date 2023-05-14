@@ -42,6 +42,7 @@ export default function PersonalInformationForm() {
     validations: FormValidations,
 
     onSubmit: async(data) => {
+      console.log(data);
       const newData = {
         name: data.name,
         cpf: data.cpf.replaceAll('.', '').replaceAll('-', ''),
@@ -57,7 +58,8 @@ export default function PersonalInformationForm() {
         },
         phone: data.phone.replace(/[^0-9]+/g, '').replace(/^(\d{2})(9?\d{4})(\d{4})$/, '($1) $2-$3'),
       };
-
+      console.log(newData);
+      
       try {
         await saveEnrollment(newData);
         toast('Informações salvas com sucesso!');
@@ -164,7 +166,7 @@ export default function PersonalInformationForm() {
               label="Data de Nascimento"
               inputVariant="outlined"
               clearable
-              value={dayjs(data.birthday).format('YYYY-MM-DD').toString()}
+              value={data.birthday ? dayjs(data.birthday).format('YYYY-MM-DD').toString() : null}
               onChange={(date) => {
                 customHandleChange('birthday', (d) => d && dayjs(d).format('YYYY-MM-DD'))(date);
               }}
