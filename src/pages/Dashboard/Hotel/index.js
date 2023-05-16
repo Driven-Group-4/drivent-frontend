@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import StepContainer from '../../../components/StepContainer/StepContainer';
 import StepTitle from '../../../components/StepContainer/StepTitle';
 import useHotels from '../../../hooks/api/useHotel.js';
+import useBooking from '../../../hooks/api/useBooking.js';
 import HotelCard from '../../../components/StepContainer/HotelCard';
 import OptionsContainer from '../../../components/StepContainer/OptionsContainer';
 import { useState } from 'react';
@@ -12,20 +13,31 @@ import Button from '../../../components/Form/Button';
 export default function Hotel() {
   const [ selectedHotel, setSelectedHotel ] = useState(null);
   const [ selectedRoom, setSelectedRoom ] = useState(null);
+  const { userBooking } = useBooking();
   const { hotels } = useHotels();
 
   return (
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
-      <StepContainer>
-        <StepTitle>{hotels?
-          'Primeiro, escolha seu hotel':
-          'Desculpe, não há hotéis disponíveis'
-        }</StepTitle>
-        <OptionsContainer>
-          { hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />) }
-        </OptionsContainer>
-      </StepContainer>
+      { userBooking &&
+        <StepContainer>
+          <StepTitle>Você já escolheu seu quarto:</StepTitle>
+          <OptionsContainer>
+            <HotelCard hotelInfo={hotels?.find(h => h.id === userBooking?.Room?.hotelId)} reserved={userBooking} />
+          </OptionsContainer>
+        </StepContainer>
+      }
+      { !userBooking &&
+        <StepContainer>
+          <StepTitle>{hotels?
+            'Primeiro, escolha seu hotel':
+            'Desculpe, não há hotéis disponíveis'
+          }</StepTitle>
+          <OptionsContainer>
+            { hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />) }
+          </OptionsContainer>
+        </StepContainer>
+      }
       { selectedHotel &&
           <StepContainer>
             <StepTitle>Ótima pedida! Agora escolha seu quarto</StepTitle>
