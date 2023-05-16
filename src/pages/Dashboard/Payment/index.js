@@ -201,7 +201,7 @@ export default function Payment() {
                     </StepTitle>
                     <PaymentConfirmed>
                       <ImageConfirmed src={vectorLogo} alt="confirmado" />
-                      <PageConfirmed>
+                      <PageConfirmed onClick={() => console.log(resume)}>
                         <b><p>Pagamento confirmado!</p></b>
                         <p>Prossiga para escolha de hospedagem e atividades</p>
                       </PageConfirmed>

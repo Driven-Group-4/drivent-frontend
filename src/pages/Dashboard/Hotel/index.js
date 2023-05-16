@@ -8,17 +8,23 @@ import OptionsContainer from '../../../components/StepContainer/OptionsContainer
 import { useState } from 'react';
 import RoomOption from '../../../components/StepContainer/RoomOption';
 import Button from '../../../components/Form/Button';
+import { postTicketReserv } from '../../../services/ticketAPI';
+import { getTicket } from '../../../services/ticketAPI';
+import useToken from '../../../hooks/useToken';
 
 export default function Hotel() {
   const [ selectedHotel, setSelectedHotel ] = useState(null);
   const [ selectedRoom, setSelectedRoom ] = useState(null);
   const { hotels } = useHotels();
+  const [resume, setResume] = useState(false);
+  const token = useToken();
+  const ticket = getTicket(token);
 
   return (
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
       <StepContainer>
-        <StepTitle>{hotels?
+        <StepTitle onClick={() => console.log(ticket)}>{hotels?
           'Primeiro, escolha seu hotel':
           'Desculpe, não há hotéis disponíveis'
         }</StepTitle>
