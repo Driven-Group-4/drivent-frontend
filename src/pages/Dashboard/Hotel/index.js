@@ -16,9 +16,9 @@ import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 
 export default function Hotel() {
+  const token = useToken();
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const token = useToken();
   const [booking, setBooking] = useState(null);
   const [changingRoom, setChangingRoom] = useState(false);
   const { userBooking } = useBooking();
