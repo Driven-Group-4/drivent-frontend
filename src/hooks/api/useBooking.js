@@ -1,22 +1,21 @@
 import useAsync from '../useAsync';
+import * as bookingAPI from '../../services/bookingAPI.js';
 import useToken from '../useToken';
-
-import * as bookingApi from '../../services/bookingApi.js';
 
 export default function useBooking() {
   const token = useToken();
 
   const {
-    data: booking,
+    data: userBooking,
     loading: bookingLoading,
     error: bookingError,
-    act: listBooking
-  } = useAsync(() => bookingApi.listBooking(token));
+    act: getBooking,
+  } = useAsync(() => bookingAPI.getBooking(token));
 
   return {
-    booking,
+    userBooking,
     bookingLoading,
     bookingError,
-    listBooking
+    getBooking,
   };
 }

@@ -1,6 +1,7 @@
+/* eslint-disable indent */
 import styled from 'styled-components';
 
-export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard }) {
+export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard, reserved }) {
   const hotelCapacity = hotelInfo?.Rooms.reduce((acc, cv) => acc + cv.capacity - cv._count.Booking, 0);
 
   function calculateHotelAccommodationType() {
@@ -44,17 +45,29 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard }) 
     return accomodationType;
   }
 
+  function calculateRoomAccommodationType() {
+    switch (reserved?.Room.capacity) {
+      case 1:
+        return `${reserved?.Room.name} (Single)`;
+      case 2:
+        return `${reserved?.Room.name} (Double)`;
+      default:
+        return `${reserved?.Room.name} (Triple)`;
+    }
+  }
+
   return (
-    <StyledCard onClick={() => setSelectedCard(hotelInfo)} isSelected={selectedCard?.id === hotelInfo.id}>
+    <StyledCard onClick={reserved ? null : () => setSelectedCard(hotelInfo)} isSelected={selectedCard?.id === hotelInfo?.id || reserved} isReserved={reserved}>
       <img src={hotelInfo?.image} alt={`Foto do hotel ${hotelInfo?.name}`} />
       <CardTitle>{hotelInfo?.name}</CardTitle>
       <div>
-        <CardSubtitle>Tipos de acomodação:</CardSubtitle><br />
-        <CardText>{calculateHotelAccommodationType()}</CardText>
+
+        <CardSubtitle>{reserved ? 'Quarto reservado' : 'Tipos de acomodação:'}</CardSubtitle><br />
+        <CardText>{reserved ? calculateRoomAccommodationType() : calculateHotelAccommodationType()}</CardText>
       </div>
       <div>
-        <CardSubtitle>Vagas disponíveis:</CardSubtitle><br />
-        <CardText>{hotelCapacity}</CardText>
+        <CardSubtitle>{reserved ? 'Pessoas no seu quarto' : 'Vagas disponíveis:'}</CardSubtitle><br />
+        <CardText>{reserved ? (reserved?.Room.capacity === 1 ? 'Você' : `Você e mais ${reserved?.Room.capacity - 1}`) : hotelCapacity}</CardText>
       </div>
     </StyledCard>
   );
