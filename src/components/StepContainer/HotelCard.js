@@ -15,7 +15,7 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard }) 
     for (let i = 0; i < capacities.length; i++) {
       if (i === 0) {
         if (capacities[i] === 1) accomodationType = 'Single';
-        if (capacities[i] === 2) accomodationType = 'Duple';
+        if (capacities[i] === 2) accomodationType = 'Double';
         if (capacities[i] === 3) accomodationType = 'Triple';
         if (capacities[i] > 3) {
           accomodationType = 'Outros';
@@ -26,7 +26,7 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard }) 
       }
 
       if (i === 1) {
-        if (capacities[i] === 2) accomodationType += 'Duple';
+        if (capacities[i] === 2) accomodationType += 'Double';
         if (capacities[i] === 3) accomodationType += 'Triple';
         if (capacities[i] > 3) {
           accomodationType += 'Outros';
@@ -37,7 +37,7 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard }) 
 
       if (i === 2) {
         if (capacities[i] === 3) accomodationType += 'Triple';
-        if(capacities[i] > 3) accomodationType += 'Outros';
+        if (capacities[i] > 3) accomodationType += 'Outros';
       }
     }
 
@@ -49,11 +49,11 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard }) 
       <img src={hotelInfo?.image} alt={`Foto do hotel ${hotelInfo?.name}`} />
       <CardTitle>{hotelInfo?.name}</CardTitle>
       <div>
-        <CardSubtitle>Tipos de acomodação:</CardSubtitle><br/>
+        <CardSubtitle>Tipos de acomodação:</CardSubtitle><br />
         <CardText>{calculateHotelAccommodationType()}</CardText>
       </div>
       <div>
-        <CardSubtitle>Vagas disponíveis:</CardSubtitle><br/>
+        <CardSubtitle>Vagas disponíveis:</CardSubtitle><br />
         <CardText>{hotelCapacity}</CardText>
       </div>
     </StyledCard>
