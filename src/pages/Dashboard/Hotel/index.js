@@ -10,15 +10,18 @@ import OptionsContainer from '../../../components/StepContainer/OptionsContainer
 import { useState } from 'react';
 import RoomOption from '../../../components/StepContainer/RoomOption';
 import Button from '../../../components/Form/Button';
+import useToken from '../../../hooks/useToken';
+import { bookingRoom, changeBooking, getBooking } from '../../../services/bookingAPI';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
 
 export default function Hotel() {
-  const [ selectedHotel, setSelectedHotel ] = useState(null);
-  const [ selectedRoom, setSelectedRoom ] = useState(null);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const token = useToken();
   const [booking, setBooking] = useState(null);
   const [changingRoom, setChangingRoom] = useState(false);
   const { userBooking } = useBooking();
-
 
   const { hotels } = useHotels();
   const [paid, setPaid] = useState(false);
