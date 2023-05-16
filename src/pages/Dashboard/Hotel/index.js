@@ -14,7 +14,11 @@ import Button from '../../../components/Form/Button';
 export default function Hotel() {
   const [ selectedHotel, setSelectedHotel ] = useState(null);
   const [ selectedRoom, setSelectedRoom ] = useState(null);
+  const token = useToken();
+  const [booking, setBooking] = useState(null);
+  const [changingRoom, setChangingRoom] = useState(false);
   const { userBooking } = useBooking();
+
 
   const { hotels } = useHotels();
   const [paid, setPaid] = useState(false);
@@ -69,17 +73,23 @@ export default function Hotel() {
   return (
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
-      { userBooking &&
+      {booking ?
+        <>
+          <StepContainer>
+            <StepTitle>Você já escolheu seu quarto:</StepTitle>
+            <OptionsContainer>
+              <HotelCard hotelInfo={hotels?.find(h => h.id === booking?.Room?.hotelId)} reserved={booking} />
+            </OptionsContainer>
+          </StepContainer>
+          <StepContainer>
+            <Button onClick={(e) => changeRoom(e)} type="submit">
+              TROCAR DE QUARTO
+            </Button>
+          </StepContainer>
+        </>
+        :
         <StepContainer>
-          <StepTitle>Você já escolheu seu quarto:</StepTitle>
-          <OptionsContainer>
-            <HotelCard hotelInfo={hotels?.find(h => h.id === userBooking?.Room?.hotelId)} reserved={userBooking} />
-          </OptionsContainer>
-        </StepContainer>
-      }
-      { !userBooking &&
-        <StepContainer>
-          <StepTitle>{hotels?
+         <StepTitle>{hotels?
             'Primeiro, escolha seu hotel':
             'Desculpe, não há hotéis disponíveis'
           }</StepTitle> : <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>
@@ -106,7 +116,7 @@ export default function Hotel() {
     </>
   );
 }
-
+ 
 const StyledTypography = styled(Typography)`
   margin-bottom: 20px!important;
 `;
