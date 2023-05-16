@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import styled from 'styled-components';
 
 export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard, reserved }) {
@@ -15,7 +16,7 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard, re
     for (let i = 0; i < capacities.length; i++) {
       if (i === 0) {
         if (capacities[i] === 1) accomodationType = 'Single';
-        if (capacities[i] === 2) accomodationType = 'Duple';
+        if (capacities[i] === 2) accomodationType = 'Double';
         if (capacities[i] === 3) accomodationType = 'Triple';
         if (capacities[i] > 3) {
           accomodationType = 'Outros';
@@ -26,7 +27,7 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard, re
       }
 
       if (i === 1) {
-        if (capacities[i] === 2) accomodationType += 'Duple';
+        if (capacities[i] === 2) accomodationType += 'Double';
         if (capacities[i] === 3) accomodationType += 'Triple';
         if (capacities[i] > 3) {
           accomodationType += 'Outros';
@@ -37,7 +38,7 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard, re
 
       if (i === 2) {
         if (capacities[i] === 3) accomodationType += 'Triple';
-        if(capacities[i] > 3) accomodationType += 'Outros';
+        if (capacities[i] > 3) accomodationType += 'Outros';
       }
     }
 
@@ -46,26 +47,27 @@ export default function HotelCard({ hotelInfo, selectedCard, setSelectedCard, re
 
   function calculateRoomAccommodationType() {
     switch (reserved?.Room.capacity) {
-    case 1:
-      return `${reserved?.Room.name} (Single)`;
-    case 2:
-      return `${reserved?.Room.name} (Double)`;
-    default:
-      return `${reserved?.Room.name} (Triple)`;
+      case 1:
+        return `${reserved?.Room.name} (Single)`;
+      case 2:
+        return `${reserved?.Room.name} (Double)`;
+      default:
+        return `${reserved?.Room.name} (Triple)`;
     }
   }
 
   return (
-    <StyledCard onClick={reserved ? null : () => setSelectedCard(hotelInfo)} isSelected={selectedCard?.id === hotelInfo?.id || reserved } isReserved={reserved}>
+    <StyledCard onClick={reserved ? null : () => setSelectedCard(hotelInfo)} isSelected={selectedCard?.id === hotelInfo?.id || reserved} isReserved={reserved}>
       <img src={hotelInfo?.image} alt={`Foto do hotel ${hotelInfo?.name}`} />
       <CardTitle>{hotelInfo?.name}</CardTitle>
       <div>
-        <CardSubtitle>{reserved ? 'Quarto reservado' : 'Tipos de acomodação:'}</CardSubtitle><br/>
-        <CardText>{ reserved ? calculateRoomAccommodationType() : calculateHotelAccommodationType()}</CardText>
+
+        <CardSubtitle>{reserved ? 'Quarto reservado' : 'Tipos de acomodação:'}</CardSubtitle><br />
+        <CardText>{reserved ? calculateRoomAccommodationType() : calculateHotelAccommodationType()}</CardText>
       </div>
       <div>
-        <CardSubtitle>{reserved ? 'Pessoas no seu quarto' : 'Vagas disponíveis:'}</CardSubtitle><br/>
-        <CardText>{ reserved ? (reserved?.Room.capacity === 1 ? 'Você' : `Você e mais ${reserved?.Room.capacity - 1}`) : hotelCapacity}</CardText>
+        <CardSubtitle>{reserved ? 'Pessoas no seu quarto' : 'Vagas disponíveis:'}</CardSubtitle><br />
+        <CardText>{reserved ? (reserved?.Room.capacity === 1 ? 'Você' : `Você e mais ${reserved?.Room.capacity - 1}`) : hotelCapacity}</CardText>
       </div>
     </StyledCard>
   );
