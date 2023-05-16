@@ -82,7 +82,7 @@ export default function Hotel() {
           <StepTitle>{hotels?
             'Primeiro, escolha seu hotel':
             'Desculpe, não há hotéis disponíveis'
-          }</StepTitle> : <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>}
+          }</StepTitle> : <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>
           <OptionsContainer>
             {hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />)}
           </OptionsContainer>
