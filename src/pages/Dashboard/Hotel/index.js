@@ -10,13 +10,12 @@ import OptionsContainer from '../../../components/StepContainer/OptionsContainer
 import { useState } from 'react';
 import RoomOption from '../../../components/StepContainer/RoomOption';
 import Button from '../../../components/Form/Button';
-import { getTicket } from '../../../services/ticketAPI';
-import useToken from '../../../hooks/useToken';
 
 export default function Hotel() {
-  const [selectedHotel, setSelectedHotel] = useState(null);
-  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [ selectedHotel, setSelectedHotel ] = useState(null);
+  const [ selectedRoom, setSelectedRoom ] = useState(null);
   const { userBooking } = useBooking();
+
   const { hotels } = useHotels();
   const [paid, setPaid] = useState(false);
 
@@ -27,18 +26,50 @@ export default function Hotel() {
   }
   getConfirmed();
 
+  async function handleBooking(e) {
+    e.preventDefault();
+
+    if (!changingRoom) {
+      try {
+        await bookingRoom(token, selectedRoom.id);
+        toast('Reserva efetuada com sucesso');
+        const actualbooking = await getBooking(token);
+        setBooking(actualbooking);
+        setSelectedHotel(null);
+        setSelectedRoom(null);
+      } catch (error) {
+        toast(error.message);
+      }
+    } else {
+      const actualbooking = await getBooking(token);
+      await changeBooking(token, selectedRoom.id, actualbooking.id);
+    }
+  }
+
+  function changeRoom(e) {
+    e.preventDefault();
+
+    hotels.forEach(h => {
+      h.Rooms.forEach(r => {
+        if (r.id === booking.Room.id) {
+          setSelectedRoom(r);
+          setSelectedHotel(h);
+        }
+      });
+    });
+
+    setBooking(null);
+    setChangingRoom(true);
+  }
+
+  useEffect(() => {
+    setBooking(userBooking);
+  }, [userBooking]);
+
   return (
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
-      <StepContainer>
-        <StepTitle>
-          
-        </StepTitle>
-        <OptionsContainer>
-          {hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />)}
-        </OptionsContainer>
-      </StepContainer>
-      {userBooking &&
+      { userBooking &&
         <StepContainer>
           <StepTitle>Você já escolheu seu quarto:</StepTitle>
           <OptionsContainer>
@@ -46,10 +77,10 @@ export default function Hotel() {
           </OptionsContainer>
         </StepContainer>
       }
-      {!userBooking &&
+      { !userBooking &&
         <StepContainer>
-          {paid.status === 'PAID' ?  <StepTitle>{hotels ?
-            'Primeiro, escolha seu hotel' :
+          <StepTitle>{hotels?
+            'Primeiro, escolha seu hotel':
             'Desculpe, não há hotéis disponíveis'
           }</StepTitle> : <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>}
           <OptionsContainer>
@@ -67,8 +98,8 @@ export default function Hotel() {
       }
       {selectedRoom &&
         <StepContainer>
-          <Button onClick={() => alert('Quase lá')} type="submit">
-            FINALIZAR PAGAMENTO
+          <Button onClick={(e) => handleBooking(e)} type="submit">
+            RESERVAR QUARTO
           </Button>
         </StepContainer>
       }
