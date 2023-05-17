@@ -2,6 +2,7 @@ import { Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import StepContainer from '../../../components/StepContainer/StepContainer';
 import StepTitle from '../../../components/StepContainer/StepTitle';
+import StepPayment from '../../../components/StepContainer/StepPayment';
 import useHotels from '../../../hooks/api/useHotel.js';
 import useBooking from '../../../hooks/api/useBooking.js';
 import HotelCard from '../../../components/StepContainer/HotelCard';
@@ -13,6 +14,7 @@ import useToken from '../../../hooks/useToken';
 import { bookingRoom, changeBooking, getBooking } from '../../../services/bookingAPI';
 import { toast } from 'react-toastify';
 import { useEffect } from 'react';
+import { getTicket } from '../../../services/ticketAPI';
 
 export default function Hotel() {
   const token = useToken();
@@ -23,6 +25,14 @@ export default function Hotel() {
   const { userBooking } = useBooking();
 
   const { hotels } = useHotels();
+  const [paid, setPaid] = useState(false);
+
+  async function getConfirmed() {
+    const token = useToken();
+    const ticket = await getTicket(token);
+    setPaid(ticket);
+  }
+  getConfirmed();
 
   async function handleBooking(e) {
     e.preventDefault();
@@ -83,10 +93,11 @@ export default function Hotel() {
         </>
         :
         <StepContainer>
-          <StepTitle>{hotels ?
+
+          {paid.status === 'PAID' ? <StepTitle>{hotels ?
             'Primeiro, escolha seu hotel' :
             'Desculpe, não há hotéis disponíveis'
-          }</StepTitle>
+          }</StepTitle> : <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>}
           <OptionsContainer>
             {hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />)}
           </OptionsContainer>
