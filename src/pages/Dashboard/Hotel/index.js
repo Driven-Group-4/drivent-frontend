@@ -14,6 +14,7 @@ import useToken from '../../../hooks/useToken';
 import { bookingRoom, changeBooking, getBooking } from '../../../services/bookingAPI';
 import { toast } from 'react-toastify';
 import { useEffect } from 'react';
+import { getTicket } from '../../../services/ticketAPI';
 
 export default function Hotel() {
   const token = useToken();
@@ -92,10 +93,11 @@ export default function Hotel() {
         </>
         :
         <StepContainer>
-         <StepTitle>{hotels?
-            'Primeiro, escolha seu hotel':
+
+          {paid.status === 'PAID' ? <StepTitle>{hotels ?
+            'Primeiro, escolha seu hotel' :
             'Desculpe, não há hotéis disponíveis'
-          }</StepTitle> : <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>
+          }</StepTitle> : <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>}
           <OptionsContainer>
             {hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />)}
           </OptionsContainer>
@@ -119,7 +121,7 @@ export default function Hotel() {
     </>
   );
 }
- 
+
 const StyledTypography = styled(Typography)`
   margin-bottom: 20px!important;
 `;
