@@ -117,6 +117,7 @@ export default function Payment() {
                     types.includesHotel ?
                       <RadioOption
                         selectOption={setTicketSelected}
+                        key={types.id}
                         text={types.isRemote ? 'Online' : 'Presencial'}
                         subtext={'R$ 500,00'}
                         name="ticketType"
