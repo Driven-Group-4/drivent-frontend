@@ -15,6 +15,7 @@ import { bookingRoom, changeBooking, getBooking } from '../../../services/bookin
 import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 import { getTicket } from '../../../services/ticketAPI';
+import useTicketType from '../../../hooks/api/useTicketType';
 
 export default function Hotel() {
   const token = useToken();
@@ -23,16 +24,28 @@ export default function Hotel() {
   const [booking, setBooking] = useState(null);
   const [changingRoom, setChangingRoom] = useState(false);
   const { userBooking } = useBooking();
+  const { ticketTypes } = useTicketType();
+  const [withHotel, setWithHotel] = useState(null);
 
   const { hotels } = useHotels();
   const [paid, setPaid] = useState(false);
 
+  useEffect(() => {
+    getConfirmed();
+    if (ticketTypes) {
+      const test = ticketTypes.filter(tt => tt.includesHotel);
+      setWithHotel(test);
+    }
+  }, [ticketTypes]);
+
+  useEffect(() => {
+    setBooking(userBooking);
+  }, [userBooking]);
+  
   async function getConfirmed() {
-    const token = useToken();
     const ticket = await getTicket(token);
     setPaid(ticket);
   }
-  getConfirmed();
 
   async function handleBooking(e) {
     e.preventDefault();
@@ -70,10 +83,6 @@ export default function Hotel() {
     setChangingRoom(true);
   }
 
-  useEffect(() => {
-    setBooking(userBooking);
-  }, [userBooking]);
-
   return (
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
@@ -92,17 +101,32 @@ export default function Hotel() {
           </StepContainer>
         </>
         :
-        <StepContainer>
-
-          {paid.status === 'PAID' ? <StepTitle>{hotels ?
-            'Primeiro, escolha seu hotel' :
-            'Desculpe, não há hotéis disponíveis'
-          }</StepTitle> : <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>}
-          <OptionsContainer>
-            {hotels?.map((h) => <HotelCard key={h.id} hotelInfo={h} selectedCard={selectedHotel} setSelectedCard={setSelectedHotel} />)}
-          </OptionsContainer>
-        </StepContainer>
-      }
+        !withHotel ? <div>Loading...</div> :
+          <StepContainer>
+            {paid.status === 'PAID' ? 
+              <StepTitle>
+                {
+                  paid.ticketTypeId !== withHotel[0].id ?
+                    'Seu ticket não dá direito a reserva de hotel' : hotels ?
+                      'Primeiro, escolha seu hotel' :
+                      'Desculpe, não há hotéis disponíveis'
+                }
+              </StepTitle> : 
+              <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</StepPayment>}
+            <OptionsContainer>
+              {
+                hotels?.map((h) =>
+                  <HotelCard
+                    key={h.id}
+                    hotelInfo={h} 
+                    selectedCard={selectedHotel} 
+                    setSelectedCard={setSelectedHotel}
+                  />)
+              }
+            </OptionsContainer>
+          </StepContainer> 
+      }         
+                    
       {selectedHotel &&
         <StepContainer>
           <StepTitle>Ótima pedida! Agora escolha seu quarto</StepTitle>
