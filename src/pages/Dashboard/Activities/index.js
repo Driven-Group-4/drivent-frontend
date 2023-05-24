@@ -6,8 +6,10 @@ import OptionsContainer from '../../../components/StepContainer/OptionsContainer
 import DayCard from '../../../components/StepContainer/DayCard.js';
 import useToken from '../../../hooks/useToken';
 import { getTicket } from '../../../services/ticketAPI';
-import StepActivities from '../../../components/StepContainer/StepActivities';
 import StepPayment from '../../../components/StepContainer/StepPayment';
+import styled from 'styled-components';
+import { Typography } from '@material-ui/core';
+
 export default function Activities() {
   const token = useToken();
   const [paid, setPaid] = useState(false);
@@ -30,7 +32,7 @@ export default function Activities() {
 
   return (
     <>
-      <StepActivities>Escolha de atividades</StepActivities>
+      <StyledTypography variant='h4'>Escolha de atividades</StyledTypography>
       {paid.status !== 'PAID' && <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de atividades</StepPayment>}
       {paid.status === 'PAID' && (
         <StepContainer>
@@ -44,4 +46,6 @@ export default function Activities() {
   );
 }
 
-/* eslint-disable eol-last */
+const StyledTypography = styled(Typography)`
+  margin-bottom: 20px!important;
+`;
