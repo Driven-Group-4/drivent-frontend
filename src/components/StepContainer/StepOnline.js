@@ -9,8 +9,8 @@ export default styled.span`
   font-size: 20px;
   font-weight: 400;
   color: #8E8E8E;
-  margin-top: 213px;
-  width:411px;
-  height:46px;
-  margin-left:244px;
+  width:540px;
+  height:30px;
+  margin-left:150px;
+  margin-top:243px;
 `;
