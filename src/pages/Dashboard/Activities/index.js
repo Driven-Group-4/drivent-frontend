@@ -9,6 +9,7 @@ import { getTicket } from '../../../services/ticketAPI';
 import StepPayment from '../../../components/StepContainer/StepPayment';
 import styled from 'styled-components';
 import { Typography } from '@material-ui/core';
+import StepOnline from '../../../components/StepContainer/StepOnline.js';
 
 export default function Activities() {
   const token = useToken();
@@ -34,7 +35,10 @@ export default function Activities() {
     <>
       <StyledTypography variant='h4'>Escolha de atividades</StyledTypography>
       {paid.status !== 'PAID' && <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de atividades</StepPayment>}
-      {paid.status === 'PAID' && (
+      {(paid.status === 'PAID' && paid.TicketType.isRemote === true) && (
+        <StepOnline>Sua modalidade de ingresso não necessita escolher atividade. Você terá acesso a todas as atividades</StepOnline>
+      )}
+      {(paid.status === 'PAID' && paid.TicketType.isRemote === false) && (
         <StepContainer>
           <StepTitle>Primeiro, filtre pelo dia do evento: </StepTitle>
           <OptionsContainer>
