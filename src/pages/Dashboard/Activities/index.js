@@ -16,7 +16,7 @@ import Local from '../../../components/StepContainer/Local.js';
 export default function Activities() {
   const token = useToken();
   const [paid, setPaid] = useState(false);
-  const [ selectedDate, setSelectedDate ] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const { eventInfo } = useContext(EventInfoContext);
 
   async function getConfirmed() {
@@ -26,7 +26,7 @@ export default function Activities() {
 
   const eventDays = [];
   let currentDay = new Date(eventInfo?.startsAt);
-  while(currentDay <= new Date(eventInfo?.endsAt)) {
+  while (currentDay <= new Date(eventInfo?.endsAt)) {
     eventDays.push(new Date(currentDay));
     currentDay.setDate(currentDay.getDate() + 1);
   }
@@ -45,17 +45,17 @@ export default function Activities() {
       <StyledTypography variant='h4'>Escolha de atividades</StyledTypography>
       {paid.status !== 'PAID' && <StepPayment>Você precisa ter confirmado pagamento antes de fazer a escolha de atividades</StepPayment>}
       {
-        (paid.status === 'PAID' && paid.TicketType.isRemote === true) && 
-          <StepOnline>Sua modalidade de ingresso não necessita escolher atividade. Você terá acesso a todas as atividades</StepOnline>
+        (paid.status === 'PAID' && paid.TicketType.isRemote === true) &&
+        <StepOnline>Sua modalidade de ingresso não necessita escolher atividade. Você terá acesso a todas as atividades</StepOnline>
       }
       {
-        (paid.status === 'PAID' && paid.TicketType.isRemote === false) && 
-          <StepContainer>
-            <StepTitle>Primeiro, filtre pelo dia do evento: </StepTitle>
-            <OptionsContainer>
-              { eventDays.map((day, i) => <DayCard key={i} date={day} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />) }
-            </OptionsContainer>
-          </StepContainer>
+        (paid.status === 'PAID' && paid.TicketType.isRemote === false) &&
+        <StepContainer>
+          <StepTitle>Primeiro, filtre pelo dia do evento: </StepTitle>
+          <OptionsContainer>
+            {eventDays.map((day, i) => <DayCard key={i} date={day} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />)}
+          </OptionsContainer>
+        </StepContainer>
       }
       {
         selectedDate &&
