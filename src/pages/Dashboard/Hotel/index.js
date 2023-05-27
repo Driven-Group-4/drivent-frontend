@@ -49,8 +49,12 @@ export default function Hotel() {
   }, [hotels]);
 
   async function getConfirmed() {
-    const ticket = await getTicket(token);
-    setPaid(ticket);
+    try {
+      const ticket = await getTicket(token);
+      setPaid(ticket);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async function handleBooking(e) {
